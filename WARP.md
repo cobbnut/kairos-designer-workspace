@@ -34,7 +34,7 @@ cd kdes
 venv\Scripts\Activate.ps1
 python run.py
 
-# Frontend (Vite dev server on http://localhost:3000)
+# Frontend (Vite dev server on https://kairos:3000)
 cd kdes-fe
 npm install
 npm run dev
@@ -166,7 +166,7 @@ kdes/kairos/
 ## Development Environment
 
 ### Environment Configuration
-- **Frontend**: `VITE_API_BASE_URL=https://kairos:5002` (development)
+- **Frontend**: `https://kairos:3000` with `VITE_API_BASE_URL=https://kairos:5002` (development)
 - **Backend**: HTTPS on port 5002 with self-signed SSL certificates
 - **Database**: PostgreSQL connection configured in `kdes/kairos/config.py`
 - **Hot Reloading**: Both Vite and Flask support automatic reloading
