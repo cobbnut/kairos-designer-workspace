@@ -1,0 +1,69 @@
+# Kairos Designer - Root Level .gitignore
+# This ignores files at the root level only
+# Individual projects (kdes-fe/, kdes/) have their own .gitignore files
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.bak
+*.swp
+*.swo
+*~
+
+# IDE and editor files
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.sublime-*
+*.code-workspace
+
+# Project-specific temporary files
+*.zip
+*.tar.gz
+*.tree
+.tmp.*
+
+# Environment variables (if any root-level env files exist)
+.env
+.env.local
+.env.production
+
+# Root-level build artifacts (if any)
+/build/
+/dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Documentation build artifacts
+docs/_build/
+
+# Backup files
+*.bak
+*.orig
+
+# Note: Subproject-specific ignores are handled by:
+# - kdes-fe/.gitignore (Node.js/React specific)
+# - kdes/.gitignore (Python/Flask specific)
