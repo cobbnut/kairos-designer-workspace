@@ -94,6 +94,8 @@ All new APIs must be added to appropriate functional modules:
 - **UI Framework**: Bootstrap 5 + React Bootstrap for consistent styling
 - **Rich Text**: Multiple editors (Lexical, Quill, Monaco) for different use cases
 - **File Handling**: Uppy for uploads with drag-drop and progress tracking
+- **AI Chat Interface**: Advanced chat system with SSE streaming, markdown, KaTeX, and Mermaid
+- **Voice Input**: Speech recognition integration for voice-to-text chat
 
 ### Backend Architecture (kdes)
 - **Web Framework**: Flask with blueprint-based modular architecture
@@ -101,7 +103,8 @@ All new APIs must be added to appropriate functional modules:
 - **Authentication**: JWT tokens with automatic refresh, OAuth support
 - **API Design**: RESTful endpoints organized by functional blueprints
 - **Real-time**: Flask-SocketIO for WebSocket communication
-- **AI Integration**: OpenAI API integration for assistant functionality
+- **AI Integration**: OpenAI Assistants API with custom tool calling system
+- **External API Management**: Dynamic API registration and tool calling system
 - **File Management**: Secure UUID-based file downloads with authentication
 - **Configuration**: Environment-based config with SSL certificate support
 
@@ -110,6 +113,8 @@ All new APIs must be added to appropriate functional modules:
 React Components → ApiBroker → Flask Blueprints → SQLAlchemy → PostgreSQL
        ↕                                ↕
 Socket.IO Client ←→ Flask-SocketIO (real-time updates)
+       ↕                                ↕
+Chat Interface → SSE Stream → OpenAI Assistant → Tool Calls → Form Hydration
 ```
 
 ### Directory Structure Significance
@@ -145,6 +150,27 @@ kdes/kairos/
 5. **Add Socket.IO events** - Real-time updates for data synchronization
 6. **Test complete flow** - End-to-end user journey validation
 
+### AI Assistant Integration Architecture
+
+#### Dynamic Assistant Creation
+- **$-Triggered Assistants**: Users can create new assistants by starting messages with "$"
+- **Contextual Tool Generation**: Assistants are built with tools based on user's access rights
+- **Template System**: Uses Jinja-style templates for assistant prompt generation
+
+#### Tool Calling System
+1. **Navigation Tools**: Assistant can navigate users to specific forms/pages
+2. **Form Hydration Tools**: Assistant can fill forms with structured data (e.g., "draft_incidents")
+3. **External API Tools**: Configurable 3rd-party API calls (weather, news, OMDB, etc.)
+4. **Real-time Processing**: SSE streaming with tool call buffering and execution
+
+#### Chat Interface Features
+- **Markdown Rendering**: Full GFM support with `react-markdown`
+- **KaTeX Math**: LaTeX formula rendering with `rehype-katex`
+- **Mermaid Diagrams**: Interactive diagram rendering with export functionality
+- **Image Generation**: OpenAI-generated images served securely
+- **Voice Input**: Speech-to-text integration
+- **Message Persistence**: Database storage with thread management
+
 ### Authentication Flow
 - JWT tokens managed automatically by ApiBroker
 - Token refresh handled transparently
@@ -162,6 +188,14 @@ kdes/kairos/
 - Backend processes files with UUID-based secure storage
 - ApiBroker's `downloadFile()` method for authenticated downloads
 - Support for multiple file types and drag-drop interfaces
+
+### AI-Powered Tool Calling Flow
+1. **User Input Processing**: Chat message parsed for "$" prefix (new assistant trigger)
+2. **Assistant Tool Registration**: Dynamic tool schema generation based on user permissions
+3. **OpenAI Streaming**: Server-sent events stream assistant responses
+4. **Tool Call Detection**: Backend identifies and processes tool calls (navigation, form filling, API calls)
+5. **Form Hydration**: Assistant can populate form fields with structured data
+6. **3-Way Conversation**: User ↔ Assistant ↔ Application Forms create interactive workflows
 
 ## Development Environment
 
@@ -187,8 +221,12 @@ kdes/kairos/
 - **Lexical 0.33.1** + **Quill 2.0.3** + **Monaco Editor** - Rich text editing
 - **@dnd-kit 6.3.1** - Drag and drop functionality
 - **Uppy 4.x** - File upload handling with dashboard
-- **Mermaid 11.8.1** - Diagram rendering
+- **Mermaid 11.8.1** - Interactive diagram rendering with SVG export
 - **Socket.IO Client** - Real-time WebSocket communication
+- **React Markdown 10.1.0** - Full markdown rendering with GFM support
+- **Rehype KaTeX 7.0.1** - LaTeX math formula rendering
+- **Rehype Raw 7.0.0** - Raw HTML support in markdown
+- **Remark GFM 4.0.1** + **Remark Math 6.0.0** - GitHub Flavored Markdown + math
 
 ### Backend Dependencies
 - **Flask 3.1.0** + **Flask-SQLAlchemy 3.1.1** - Web framework + ORM
@@ -219,3 +257,75 @@ Always comment code extensively for maintainability:
 - Implement proper prop types and default values
 - Handle loading and error states in UI
 - Follow Bootstrap styling patterns consistently
+
+## AI Assistant Capabilities
+
+### Core AI Features
+The application includes a sophisticated AI assistant system powered by OpenAI's Assistants API with advanced tool calling capabilities:
+
+#### Content Generation & Rendering
+- **Rich Markdown**: Full GitHub Flavored Markdown with tables, lists, code blocks
+- **LaTeX Math**: Inline and display math formulas rendered with KaTeX
+- **Mermaid Diagrams**: Interactive flowcharts, sequence diagrams, and visualizations
+- **Image Generation**: AI-generated plots, charts, and graphics
+- **Code Highlighting**: Syntax highlighting for multiple programming languages
+
+#### Interactive Tool Calling
+1. **Dynamic Assistant Creation**: Start any message with "$" to create a custom assistant
+2. **Navigation Control**: Assistant can guide users to specific application pages
+3. **Form Automation**: AI can populate forms with structured data based on natural language
+4. **External API Integration**: Weather, news, movie data, and other 3rd-party services
+
+#### Example Usage Scenarios
+
+**Incident Reporting:**
+```
+User: "We had an incident. John and Freda were having a row in the coffee area 
+and Freda has complained to HR. it's now a formal complaint."
+
+Assistant Response:
+1. Navigates to incident form page
+2. Fills form fields with extracted details:
+   - Involved parties: John, Freda
+   - Location: coffee area
+   - Type: formal HR complaint
+   - Nature: interpersonal conflict
+3. Provides guidance text for next steps
+```
+
+**Mathematical Content:**
+```
+User: "Show me the quadratic formula and a plot of y = x² - 4x + 3"
+
+Assistant Response:
+- Renders LaTeX formula: $$x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$$
+- Generates Python plot image showing the parabola
+- Provides mathematical explanation
+```
+
+**Process Visualization:**
+```
+User: "Create a workflow diagram for user onboarding"
+
+Assistant Response:
+- Generates Mermaid diagram with interactive nodes
+- Provides downloadable SVG export
+- Explains each step in the process
+```
+
+### Technical Implementation Notes
+
+#### Tool Registration System
+- Tools are dynamically generated based on user permissions and available forms
+- External APIs configured in database with authentication and schema validation
+- Role-based access control determines which tools are available to each user
+
+#### Streaming Architecture
+- Server-sent events provide real-time response streaming
+- Tool calls are buffered and executed in batches
+- Form hydration happens asynchronously while maintaining conversation flow
+
+#### Message Persistence
+- All conversations stored in PostgreSQL with thread management
+- Image files cached securely with UUID-based authentication
+- Message history maintained across sessions
